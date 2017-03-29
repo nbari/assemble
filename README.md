@@ -4,7 +4,7 @@ build &amp; pack
 
 ## prototype
 
-Assembly line/set of instructions defined on an `asm.yml`
+**`assemble`**  read line/set of instructions defined on an `asm.yml`
 
 
 Implement loops
