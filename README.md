@@ -1,11 +1,7 @@
-# assembler - One who assembles items.
-
-build &amp; pack
+# assemble
+`assemble` following a set of defined instructions in a YAML file `asm.yml`
 
 ## prototype
-
-**`assemble`**  read line/set of instructions defined on an `asm.yml`
-
 
 Implement loops
 
