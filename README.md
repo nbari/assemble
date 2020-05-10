@@ -21,5 +21,5 @@ deploy:
     access_key_id: key_id
     secret_access_key: access_key
     bucket: "s3 bucket"
-    src: app.tar.xv
+    src: app.tar.xz
 ```
