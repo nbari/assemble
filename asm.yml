@@ -1,0 +1,29 @@
+---
+env:
+  KEY: value
+  ENV: staging
+
+steps:
+  - name: clean
+    cmd: cargo clean
+
+  - name: test
+    cmd: cargo test
+
+  - name: build
+    cmd: cargo build
+
+  - name: clippy
+    cmd: cargo clippy --all-targets --all-features -- -D clippy::pedantic -D clippy::nurser
+
+deploy:
+  - provider: s3
+    access_key_id: "YOUR AWS ACCESS KEY"
+    secret_access_key: "YOUR AWS SECRET KEY"
+    bucket: "S3 Bucket"
+    glob: "*.txt"
+  - provider: s3
+    access_key_id: "YOUR AWS ACCESS KEY"
+    secret_access_key: "YOUR AWS SECRET KEY"
+    bucket: "Second S3 Bucket"
+    src: file
