@@ -4,17 +4,14 @@ env:
   ENV: staging
 
 steps:
-  - name: clean
-    cmd: cargo clean
+  - name: test
+    cmd: env
 
   - name: test
-    cmd: cargo test
+    cmd: false
 
-  - name: build
-    cmd: cargo build
-
-  - name: clippy
-    cmd: cargo clippy --all-targets --all-features -- -D clippy::pedantic -D clippy::nurser
+  - name: uname
+    cmd: uname -a
 
 deploy:
   - provider: s3

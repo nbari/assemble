@@ -1,5 +1,6 @@
-use assemble::{color, config};
+use assemble::{color, command, config};
 use clap::{App, Arg};
+use std::io::{self, Write};
 use std::process;
 
 fn main() {
@@ -31,18 +32,30 @@ fn main() {
         Ok(yml) => yml,
     };
 
-    println!("steps");
     for k in &yml.steps {
         println!("STEP [{}]", k.name);
-        if let Err(e) = color::print("ok: stdout", "green") {
-            eprintln!("{:?}", e);
-        };
-
-        if let Err(e) = color::print("err: stderr", "red") {
-            eprintln!("{:?}", e);
-        };
-
-        println!("{}\n", k.cmd);
+        match command::run(&k.cmd, &yml.env) {
+            Ok(output) => {
+                if let Err(e) = color::print("", "green") {
+                    eprintln!("{:?}", e);
+                }
+                io::stdout().write_all(&output.stdout).unwrap();
+                io::stderr().write_all(&output.stderr).unwrap();
+                if !output.status.success() {
+                    if let Err(e) =
+                        color::print(format!("Error in step [{}]", k.name).as_str(), "red")
+                    {
+                        eprintln!("{:?}", e);
+                    }
+                    process::exit(1);
+                }
+            }
+            Err(e) => {
+                if let Err(e) = color::print(&e.to_string(), "red") {
+                    eprintln!("{:?}", e);
+                }
+            }
+        }
     }
 }
 
