@@ -1,6 +1,5 @@
-use assemble::config;
+use assemble::{color, config};
 use clap::{App, Arg};
-use serde_yaml;
 use std::process;
 
 fn main() {
@@ -32,7 +31,19 @@ fn main() {
         Ok(yml) => yml,
     };
 
-    println!("{:?}", yml);
+    println!("steps");
+    for k in &yml.steps {
+        println!("STEP [{}]", k.name);
+        if let Err(e) = color::print("ok: stdout", "green") {
+            eprintln!("{:?}", e);
+        };
+
+        if let Err(e) = color::print("err: stderr", "red") {
+            eprintln!("{:?}", e);
+        };
+
+        println!("{}\n", k.cmd);
+    }
 }
 
 fn is_file(s: String) -> Result<(), String> {
