@@ -1,7 +1,6 @@
 # assemble
 `assemble` following a set of defined instructions in a YAML file `asm.yml`
 
-
 The `asm.yml` file:
 
 ```yaml

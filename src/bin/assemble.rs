@@ -1,6 +1,6 @@
 use assemble::{color, command, config};
 use clap::{App, Arg};
-use compound_duration::format_dhms;
+use compound_duration::{format_dhms, format_ns};
 use std::io::{self, Write};
 use std::process;
 use std::time::Instant;
@@ -40,11 +40,13 @@ fn main() {
         if let Err(e) = color::print(format!("STEP {} [{}]", i + 1, k.name).as_str(), "yellow") {
             eprintln!("{:?}", e);
         }
+        println!();
         match command::run(&k.cmd, &yml.env) {
             Ok(output) => {
                 io::stdout().write_all(&output.stdout).unwrap();
                 io::stderr().write_all(&output.stderr).unwrap();
                 if !output.status.success() {
+                    println!();
                     if let Err(e) = color::print(
                         format!("Error in step {} [{}]", i + 1, k.name).as_str(),
                         "red",
@@ -60,24 +62,17 @@ fn main() {
             }
         }
 
-        if let Err(e) = color::print(
-            format!(
-                "ok [{}] in {}",
-                k.name,
-                format_dhms(start.elapsed().as_secs() as usize)
-            )
-            .as_str(),
-            "green",
-        ) {
+        if let Err(e) = color::print(format!("ok [{}]", k.name,).as_str(), "green") {
             eprintln!("{:?}", e);
         }
+        println!(" in {}", format_ns(start.elapsed().as_nanos() as usize));
         println!();
     }
 
     // print finished
     if let Err(e) = color::print(
         format!(
-            "Finished in {}",
+            "Assemble finished in {}",
             format_dhms(now.elapsed().as_secs() as usize)
         )
         .as_str(),

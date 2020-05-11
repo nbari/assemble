@@ -9,6 +9,6 @@ use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 pub fn print(msg: &str, color: &str) -> Result<(), Box<dyn Error>> {
     let mut stdout = StandardStream::stdout(ColorChoice::Always);
     stdout.set_color(ColorSpec::new().set_fg(Some(Color::from_str(color)?)))?;
-    writeln!(&mut stdout, "{}", msg)?;
+    write!(&mut stdout, "{}", msg)?;
     Ok(stdout.reset()?)
 }
