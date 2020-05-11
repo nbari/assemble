@@ -1,7 +1,9 @@
 use assemble::{color, command, config};
 use clap::{App, Arg};
+use compound_duration::format_dhms;
 use std::io::{self, Write};
 use std::process;
+use std::time::Instant;
 
 fn main() {
     let matches = App::new("assemble")
@@ -32,30 +34,56 @@ fn main() {
         Ok(yml) => yml,
     };
 
-    for k in &yml.steps {
-        println!("STEP [{}]", k.name);
+    let now = Instant::now();
+    for (i, k) in (&yml.steps).iter().enumerate() {
+        let start = Instant::now();
+        if let Err(e) = color::print(format!("STEP {} [{}]", i + 1, k.name).as_str(), "yellow") {
+            eprintln!("{:?}", e);
+        }
         match command::run(&k.cmd, &yml.env) {
             Ok(output) => {
-                if let Err(e) = color::print("", "green") {
-                    eprintln!("{:?}", e);
-                }
                 io::stdout().write_all(&output.stdout).unwrap();
                 io::stderr().write_all(&output.stderr).unwrap();
                 if !output.status.success() {
-                    if let Err(e) =
-                        color::print(format!("Error in step [{}]", k.name).as_str(), "red")
-                    {
+                    if let Err(e) = color::print(
+                        format!("Error in step {} [{}]", i + 1, k.name).as_str(),
+                        "red",
+                    ) {
                         eprintln!("{:?}", e);
                     }
                     process::exit(1);
                 }
             }
             Err(e) => {
-                if let Err(e) = color::print(&e.to_string(), "red") {
-                    eprintln!("{:?}", e);
-                }
+                eprintln!("error executing command: {}", e);
+                process::exit(1);
             }
         }
+
+        if let Err(e) = color::print(
+            format!(
+                "ok [{}] in {}",
+                k.name,
+                format_dhms(start.elapsed().as_secs() as usize)
+            )
+            .as_str(),
+            "green",
+        ) {
+            eprintln!("{:?}", e);
+        }
+        println!();
+    }
+
+    // print finished
+    if let Err(e) = color::print(
+        format!(
+            "Finished in {}",
+            format_dhms(now.elapsed().as_secs() as usize)
+        )
+        .as_str(),
+        "green",
+    ) {
+        eprintln!("{:?}", e);
     }
 }
 

@@ -5,10 +5,10 @@ env:
 
 steps:
   - name: test
-    cmd: env
+    cmd: env && sleep 3
 
-  - name: test
-    cmd: false
+  - name: step 2
+    cmd: true
 
   - name: uname
     cmd: uname -a

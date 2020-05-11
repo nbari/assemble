@@ -14,6 +14,7 @@ name = "assemble"
 version = "0.1.1"
 dependencies = [
  "clap",
+ "compound_duration",
  "serde",
  "serde_yaml",
  "termcolor",
@@ -50,6 +51,12 @@ dependencies = [
  "unicode-width",
  "vec_map",
 ]
+
+[[package]]
+name = "compound_duration"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8c256f15e720ac4876e4296e281d5cddf7f60ac65c84a902f29521e1223ec96c"
 
 [[package]]
 name = "dtoa"
