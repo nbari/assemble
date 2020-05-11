@@ -12,6 +12,7 @@ fn main() {
             Arg::with_name("config")
                 .help("asm.yml")
                 .long("config")
+                .default_value("asm.yml")
                 .short("c")
                 .required(true)
                 .value_name("FILE")
