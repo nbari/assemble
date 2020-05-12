@@ -1,7 +1,6 @@
 use assemble::{color, command, config};
 use clap::{App, Arg};
 use compound_duration::{format_dhms, format_ns};
-use std::io::{self, Write};
 use std::process;
 use std::time::Instant;
 
@@ -35,52 +34,61 @@ fn main() {
         Ok(yml) => yml,
     };
 
-    let now = Instant::now();
-    for (i, k) in (&yml.steps).iter().enumerate() {
-        let start = Instant::now();
-        if let Err(e) = color::print(format!("STEP {} [{}]", i + 1, k.name).as_str(), "yellow") {
-            eprintln!("{:?}", e);
-        }
-        println!();
-        match command::run(&k.cmd, &yml.env) {
-            Ok(output) => {
-                io::stdout().write_all(&output.stdout).unwrap();
-                io::stderr().write_all(&output.stderr).unwrap();
-                if !output.status.success() {
-                    println!();
-                    if let Err(e) = color::print(
-                        format!("Error in step {} [{}]", i + 1, k.name).as_str(),
-                        "red",
-                    ) {
-                        eprintln!("{:?}", e);
-                    }
-                    process::exit(1);
-                }
-            }
-            Err(e) => {
-                eprintln!("error executing command: {}", e);
-                process::exit(1);
-            }
-        }
+    if yml.build.is_none() && yml.deploy.is_none() {
+        eprintln!("Need to define: 'build', 'deploy' or both.");
+        process::exit(1);
+    }
 
-        if let Err(e) = color::print(format!("ok [{}]", k.name,).as_str(), "green") {
-            eprintln!("{:?}", e);
+    let now = Instant::now();
+    if let Some(build) = &yml.build {
+        for (i, k) in build.iter().enumerate() {
+            let start = Instant::now();
+            color::print(format!("STEP {} [{}]", i + 1, k.name).as_str(), "yellow");
+            println!();
+            if let Some(cmd) = &k.r#do {
+                match command::run(cmd, &yml.env) {
+                    Ok(mut child) => match child.wait() {
+                        Ok(status) => {
+                            if !status.success() {
+                                println!();
+                                color::print(
+                                    format!("Error in step {} [{}]", i + 1, k.name).as_str(),
+                                    "red",
+                                );
+                                process::exit(1);
+                            }
+                        }
+                        Err(e) => {
+                            eprintln!("error attempting to wait: {}", e);
+                            process::exit(1);
+                        }
+                    },
+                    Err(e) => {
+                        eprintln!("error executing command: {}", e);
+                        process::exit(1);
+                    }
+                }
+                color::print(format!("ok [{}]", k.name,).as_str(), "green");
+                println!(" in {}", format_ns(start.elapsed().as_nanos() as usize));
+                println!();
+            }
+
+            // PUT
+            if let Some(put) = &k.put {
+                println!("upload a file {}", put);
+            }
         }
-        println!(" in {}", format_ns(start.elapsed().as_nanos() as usize));
-        println!();
     }
 
     // print finished
-    if let Err(e) = color::print(
+    color::print(
         format!(
             "Assemble finished in {}",
             format_dhms(now.elapsed().as_secs() as usize)
         )
         .as_str(),
         "green",
-    ) {
-        eprintln!("{:?}", e);
-    }
+    );
 }
 
 fn is_file(s: String) -> Result<(), String> {

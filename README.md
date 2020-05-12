@@ -1,24 +1,32 @@
 # assemble
-`assemble` following a set of defined instructions in a YAML file `asm.yml`
+
+`build` & `deploy` following a set of defined instructions in a YAML file `asm.yml`
 
 The `asm.yml` file:
 
 ```yaml
 ---
-env:
-  KEY: value
+name: <name of the deployment>
+version: <version to deploy>
 
-steps:
-  - name: step 1
-    cmd: test
+env: # key-value environment variables
+  KEY: <value>
 
-  - name: step 2
-    cmd: test
+build: # list of steps to do in order
+  - name: <name of the step>
+    do: <shell command to run>
+    get: <get item from storage>
+    put: <put item in storage>
 
-deploy:
-  - provider: s3
-    access_key_id: key_id
-    secret_access_key: access_key
-    bucket: "s3 bucket"
-    src: app.tar.xz
+deploy: # steps for deploying
+  - name: <name of the step>
+    do: <shell command to run>
+    get: <get item from storage>
+    put: <put item in storage>
+
+# list of supported storage types
+# needs to support get/put
+storage:
+  - type: <type like s3>
+    key: <value>
 ```
