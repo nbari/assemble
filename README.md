@@ -1,5 +1,8 @@
 # assemble
 
+[![crates.io](https://img.shields.io/crates/v/assemble.svg)](https://crates.io/crates/assemble)
+[![Build Status](https://travis-ci.org/nbari/assemble.svg?branch=master)](https://travis-ci.org/nbari/assemble)
+
 `build` & `deploy` following a set of defined instructions in a YAML file `asm.yml`
 
 The `asm.yml` file:

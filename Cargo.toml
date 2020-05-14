@@ -1,6 +1,6 @@
 [package]
 name = "assemble"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Nicolas Embriz <nbari@tequila.io>"]
 description = "assemble following a set of defined instructions in a YAML file"
 documentation = "https://github.com/nbari/assemble"
