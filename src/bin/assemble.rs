@@ -1,6 +1,8 @@
 use assemble::{color, command, config};
+use chrono::prelude::{SecondsFormat, Utc};
 use clap::{App, Arg};
 use compound_duration::{format_dhms, format_ns};
+use std::collections::BTreeMap;
 use std::process;
 use std::time::Instant;
 
@@ -39,56 +41,78 @@ fn main() {
         process::exit(1);
     }
 
+    let x = Utc::now().to_rfc3339_opts(SecondsFormat::Millis, true);
+    println!("{}", x);
+
+    // time the tasks
     let now = Instant::now();
     if let Some(build) = &yml.build {
         for (i, k) in build.iter().enumerate() {
             let start = Instant::now();
-            color::print(format!("STEP {} [{}]", i + 1, k.name).as_str(), "yellow");
-            println!();
-            if let Some(cmd) = &k.r#do {
-                match command::run(cmd, &yml.env) {
-                    Ok(mut child) => match child.wait() {
-                        Ok(status) => {
-                            if !status.success() {
-                                println!();
-                                color::print(
-                                    format!("Error in step {} [{}]", i + 1, k.name).as_str(),
-                                    "red",
-                                );
-                                process::exit(1);
-                            }
-                        }
-                        Err(e) => {
-                            eprintln!("error attempting to wait: {}", e);
-                            process::exit(1);
-                        }
-                    },
-                    Err(e) => {
-                        eprintln!("error executing command: {}", e);
-                        process::exit(1);
+            match k {
+                config::Build::Make(s) => {
+                    step_make(i, s, s, &yml.env);
+                    println!(" in {}", format_ns(start.elapsed().as_nanos() as usize));
+                    println!();
+                }
+                // steps (associative array)
+                config::Build::Step(s) => {
+                    // DO
+                    if let Some(cmd) = &s.make {
+                        step_make(i, cmd, &s.name, &yml.env);
+                        println!(" in {}", format_ns(start.elapsed().as_nanos() as usize));
+                        println!();
+                    }
+                    // PUT
+                    if let Some(put) = &s.put {
+                        println!("upload a file {}", put);
+                        color::print(format!("ok [{}]", s.name,).as_str(), "green");
+                        println!(" in {}", format_ns(start.elapsed().as_nanos() as usize));
+                        println!();
                     }
                 }
-                color::print(format!("ok [{}]", k.name,).as_str(), "green");
-                println!(" in {}", format_ns(start.elapsed().as_nanos() as usize));
-                println!();
-            }
-
-            // PUT
-            if let Some(put) = &k.put {
-                println!("upload a file {}", put);
             }
         }
-    }
 
-    // print finished
-    color::print(
-        format!(
-            "Assemble finished in {}",
-            format_dhms(now.elapsed().as_secs() as usize)
-        )
-        .as_str(),
-        "green",
-    );
+        // print finished
+        color::print(
+            format!(
+                "Assemble finished in {}",
+                format_dhms(now.elapsed().as_secs() as usize)
+            )
+            .as_str(),
+            "green",
+        );
+    }
+}
+
+// step DO (run a command)
+fn step_make(i: usize, cmd: &str, name: &str, env: &BTreeMap<String, String>) {
+    color::print(format!("STEP {} [{}]", i + 1, name).as_str(), "yellow");
+    println!();
+    match command::run(cmd, env) {
+        Ok(mut child) => match child.wait() {
+            Ok(status) => {
+                if !status.success() {
+                    println!();
+                    color::print(
+                        format!("Error in step {} [{}]", i + 1, name).as_str(),
+                        "red",
+                    );
+                    process::exit(1);
+                }
+            }
+            Err(e) => {
+                eprintln!("error attempting to wait: {}", e);
+                process::exit(1);
+            }
+        },
+        Err(e) => {
+            eprintln!("error executing command: {}", e);
+            process::exit(1);
+        }
+    }
+    color::print(format!("ok [{}]", name,).as_str(), "green");
 }
 
 fn is_file(s: String) -> Result<(), String> {

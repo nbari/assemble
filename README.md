@@ -13,6 +13,7 @@ env: # key-value environment variables
   KEY: <value>
 
 build: # list of steps to do in order
+  - <shell command to run>
   - name: <name of the step>
     do: <shell command to run>
     get: <get item from storage>
