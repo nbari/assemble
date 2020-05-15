@@ -10,7 +10,7 @@ The `asm.yml` file:
 ```yaml
 ---
 name: <name of the deployment>
-version: <version to deploy>
+version: <commit or date in ISO 8601>
 
 env: # key-value environment variables
   KEY: <value>
@@ -19,14 +19,14 @@ build: # list of steps to do in order
   - <shell command to run>
   - name: <name of the step>
     do: <shell command to run>
-    get: <get item from storage>
-    put: <put item in storage>
+    get: <s3/name/commit/item>
+    put: <s3/name/commit/item>
 
 deploy: # steps for deploying
   - name: <name of the step>
     do: <shell command to run>
-    get: <get item from storage>
-    put: <put item in storage>
+    get: <s3/name/version/item>
+    put: <s3/name/version/item>
 
 # list of supported storage types
 # needs to support get/put

@@ -1,4 +1,4 @@
-use assemble::{color, command, config};
+use assemble::{color, command, config, git};
 use chrono::prelude::{SecondsFormat, Utc};
 use clap::{App, Arg};
 use compound_duration::{format_dhms, format_ns};
@@ -41,8 +41,13 @@ fn main() {
         process::exit(1);
     }
 
-    let x = Utc::now().to_rfc3339_opts(SecondsFormat::Millis, true);
-    println!("{}", x);
+    // get git latest_commit
+    let version = match git::latest_commit() {
+        Ok(v) => v,
+        _ => Utc::now().to_rfc3339_opts(SecondsFormat::Millis, true),
+    };
+
+    println!("{}", version);
 
     // time the tasks
     let now = Instant::now();

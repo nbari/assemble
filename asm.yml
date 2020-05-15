@@ -1,6 +1,5 @@
 ---
 name: example
-version: latest
 
 env:
   RUSTFLAGS: -C link-arg=-s
@@ -14,7 +13,7 @@ build:
     do: echo $RUSTFLAGS
 
   - name: upload file
-    put: git status
+    put: file
 
 deploy:
   - name: mkdir tmpdir
