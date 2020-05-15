@@ -47,8 +47,6 @@ fn main() {
         _ => Utc::now().to_rfc3339_opts(SecondsFormat::Millis, true),
     };
 
-    println!("{}", version);
-
     // time the tasks
     let now = Instant::now();
     if let Some(build) = &yml.build {
@@ -82,12 +80,13 @@ fn main() {
         // print finished
         color::print(
             format!(
-                "Assemble finished in {}",
-                format_dhms(now.elapsed().as_secs() as usize)
+                "Assemble finished in {}\nversion: ",
+                format_dhms(now.elapsed().as_secs() as usize),
             )
             .as_str(),
             "green",
         );
+        println!("{}", version);
     }
 }
 
