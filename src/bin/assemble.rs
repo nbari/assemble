@@ -80,7 +80,8 @@ fn main() {
         // print finished
         color::print(
             format!(
-                "Assemble finished in {}\nversion: ",
+                "Assemble finished [{}] in {}\nversion: ",
+                &yml.name,
                 format_dhms(now.elapsed().as_secs() as usize),
             )
             .as_str(),
