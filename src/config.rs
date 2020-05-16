@@ -9,7 +9,7 @@ pub struct Config {
     pub env: BTreeMap<String, String>,
     pub build: Option<Vec<Build>>,
     pub deploy: Option<Vec<Step>>,
-    pub storage: Option<Vec<BTreeMap<String, String>>>,
+    pub storage: Option<S3>,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -26,4 +26,17 @@ pub struct Step {
 pub enum Build {
     Make(String),
     Step(Step),
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+pub struct S3 {
+    #[serde(default)]
+    pub endpoint: String,
+    #[serde(default)]
+    pub region: String,
+    #[serde(default)]
+    pub access_key: String,
+    #[serde(default)]
+    pub secret_key: String,
+    pub bucket: String,
 }

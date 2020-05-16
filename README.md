@@ -31,6 +31,9 @@ deploy: # steps for deploying
 # list of supported storage types
 # needs to support get/put
 storage:
-  - type: <type like s3>
-    key: <value>
+  endpoint: <s3 endpoint>
+  region: <s3 region>
+  access_key: <s3 access_key>
+  secret_key: <s3 secret_key>
+  bucket: <s3 bucket>
 ```

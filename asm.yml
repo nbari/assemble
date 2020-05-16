@@ -13,14 +13,13 @@ build:
     do: echo $RUSTFLAGS
 
   - name: upload file
-    put: file
+    put: asm.yml
 
 deploy:
   - name: mkdir tmpdir
     do: pwd
 
 storage:
-  - type: s3
-    access_key_id: "YOUR AWS ACCESS KEY"
-    secret_access_key: "YOUR AWS SECRET KEY"
-    bucket: "S3 Bucket"
+  access_key_id: "YOUR AWS ACCESS KEY"
+  secret_access_key: "YOUR AWS SECRET KEY"
+  bucket: "S3 Bucket"

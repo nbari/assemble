@@ -1,10 +1,13 @@
-use assemble::{color, command, config, git};
+use assemble::{archive, color, command, config, git, s3};
 use chrono::prelude::{SecondsFormat, Utc};
 use clap::{App, Arg};
 use compound_duration::{format_dhms, format_ns};
 use std::collections::BTreeMap;
 use std::process;
+use std::sync::Arc;
 use std::time::Instant;
+use std::{thread, time};
+use tempfile::TempDir;
 
 fn main() {
     let matches = App::new("assemble")
@@ -47,6 +50,25 @@ fn main() {
         _ => Utc::now().to_rfc3339_opts(SecondsFormat::Millis, true),
     };
 
+    // find way to only use this if PUT is used
+    let tmp_dir = match TempDir::new() {
+        Ok(d) => d,
+        Err(e) => {
+            eprintln!("Error creating tmpdir: {}", e);
+            process::exit(1);
+        }
+    };
+
+    println!("{:#?}", &yml.storage);
+
+    let s3 = match s3::Client::new(&yml.storage.unwrap()) {
+        Ok(s3) => Arc::new(s3),
+        Err(e) => {
+            eprintln!("S3 error: {}", e);
+            process::exit(1);
+        }
+    };
+
     // time the tasks
     let now = Instant::now();
     if let Some(build) = &yml.build {
@@ -67,8 +89,17 @@ fn main() {
                         println!();
                     }
                     // PUT
-                    if let Some(put) = &s.put {
-                        println!("upload a file {}", put);
+                    if let Some(file) = &s.put {
+                        color::print(format!("STEP {} [{}]", i + 1, s.name).as_str(), "yellow");
+                        println!();
+                        let packet = match archive::pack(&file, tmp_dir.path()) {
+                            Ok(p) => println!("{:?}, {}", p.file, p.checksum),
+                            Err(e) => {
+                                color::print(format!("Error archiving {}: ", file).as_str(), "red");
+                                println!("{}", e);
+                                process::exit(1);
+                            }
+                        };
                         color::print(format!("ok [{}]", s.name,).as_str(), "green");
                         println!(" in {}", format_ns(start.elapsed().as_nanos() as usize));
                         println!();
@@ -88,6 +119,12 @@ fn main() {
             "green",
         );
         println!("{}", version);
+    }
+
+    let delay = time::Duration::from_secs(3);
+    loop {
+        println!("sleeping for 3  sec ");
+        thread::sleep(delay);
     }
 }
 

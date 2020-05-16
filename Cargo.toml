@@ -1,6 +1,6 @@
 [package]
 name = "assemble"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Nicolas Embriz <nbari@tequila.io>"]
 description = "assemble following a set of defined instructions in a YAML file"
 documentation = "https://github.com/nbari/assemble"
@@ -16,10 +16,17 @@ edition = "2018"
 travis-ci = { repository = "nbari/assemble", branch = "master" }
 
 [dependencies]
+blake2s_simd = "0.5.10"
+chrono = "0.4"
 clap = "2.33"
+compound_duration = "1"
+futures = "0.1.29"
+git2 = "0.13"
+rusoto_core = "0.42.0"
+rusoto_credential = "0.42.0"
+rusoto_s3 = "0.42.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.8"
+tempfile ="3"
 termcolor = "1.1"
-compound_duration = "1"
-chrono = "0.4"
-git2 = "0.13"
+xz2 = "0.1"
