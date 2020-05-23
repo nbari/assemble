@@ -28,8 +28,7 @@ deploy: # steps for deploying
     get: <s3/name/version/item>
     put: <s3/name/version/item>
 
-# list of supported storage types
-# needs to support get/put
+# S3
 storage:
   endpoint: <s3 endpoint>
   region: <s3 region>

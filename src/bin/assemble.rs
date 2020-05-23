@@ -1,4 +1,4 @@
-use assemble::{archive, color, command, config, git, s3};
+use assemble::{archive, color, command, config, git};
 use chrono::prelude::{SecondsFormat, Utc};
 use clap::{App, Arg};
 use compound_duration::{format_dhms, format_ns};
@@ -61,6 +61,7 @@ fn main() {
 
     println!("{:#?}", &yml.storage);
 
+    /*
     let s3 = match s3::Client::new(&yml.storage.unwrap()) {
         Ok(s3) => Arc::new(s3),
         Err(e) => {
@@ -68,6 +69,10 @@ fn main() {
             process::exit(1);
         }
     };
+
+    let x = s3.objects("test".to_string(), "".to_string(), 100);
+    println!("{:?}<----", x);
+    */
 
     // time the tasks
     let now = Instant::now();
@@ -77,7 +82,7 @@ fn main() {
             match k {
                 config::Build::Make(s) => {
                     step_make(i, s, s, &yml.env);
-                    println!(" in {}", format_ns(start.elapsed().as_nanos() as usize));
+                    println!(" in {}", format_ns(start.elapsed().as_nanos()));
                     println!();
                 }
                 // steps (associative array)
@@ -85,7 +90,7 @@ fn main() {
                     // DO
                     if let Some(cmd) = &s.make {
                         step_make(i, cmd, &s.name, &yml.env);
-                        println!(" in {}", format_ns(start.elapsed().as_nanos() as usize));
+                        println!(" in {}", format_ns(start.elapsed().as_nanos()));
                         println!();
                     }
                     // PUT
@@ -101,7 +106,7 @@ fn main() {
                             }
                         };
                         color::print(format!("ok [{}]", s.name,).as_str(), "green");
-                        println!(" in {}", format_ns(start.elapsed().as_nanos() as usize));
+                        println!(" in {}", format_ns(start.elapsed().as_nanos()));
                         println!();
                     }
                 }

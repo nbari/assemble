@@ -18,7 +18,8 @@ impl Auth {
 }
 
 impl ProvideAwsCredentials for Auth {
-    type Future = Box<dyn Future<Item = AwsCredentials, Error = CredentialsError> + Send>;
+    // type Future = Box<dyn Future<Item = AwsCredentials, Error = CredentialsError> + Send>;
+    type Future = Box<dyn Future<Output = Result<AwsCredentials, CredentialsError>> + Send>;
 
     fn credentials(&self) -> Self::Future {
         let access_key = self.access_key.clone();
