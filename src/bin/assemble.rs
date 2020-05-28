@@ -62,16 +62,7 @@ fn main() {
     println!("{:#?}", &yml.storage);
 
     /*
-    let s3 = match s3::Client::new(&yml.storage.unwrap()) {
-        Ok(s3) => Arc::new(s3),
-        Err(e) => {
-            eprintln!("S3 error: {}", e);
-            process::exit(1);
-        }
-    };
-
-    let x = s3.objects("test".to_string(), "".to_string(), 100);
-    println!("{:?}<----", x);
+     need S3M to continue
     */
 
     // time the tasks
